@@ -1,11 +1,15 @@
 {
   "name": "socket.io-valkey-adapter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The Socket.IO Valkey adapter, allowing to broadcast events between several Socket.IO servers",
   "license": "MIT",
+  "homepage": "https://valkey.srinudesetti.in/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chandu-s-1729/socket-valkey-adaptor_stalwart-team.git"
+    "url": "git+https://github.com/webdevelopersrinu/socket.io-valkey-adapter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/webdevelopersrinu/socket.io-valkey-adapter/issues"
   },
   "keywords": [
     "socket.io",
