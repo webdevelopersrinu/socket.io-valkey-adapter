@@ -17,7 +17,6 @@
     "adapter",
     "pubsub",
     "websocket",
-    "glide",
     "iovalkey"
   ],
   "files": [
