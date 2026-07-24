@@ -11,14 +11,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    services:
-      valkey:
-        image: valkey/valkey:8
-        ports:
-          - 6379:6379
-
     steps:
       - uses: actions/checkout@v4
+
+      - name: Start Valkey (standalone + cluster)
+        run: docker compose up -d
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -32,6 +29,16 @@ jobs:
 
       - name: Compile
         run: npm run compile
+
+      - name: Wait for cluster to be ready
+        run: |
+          for i in $(seq 1 30); do
+            state=$(docker compose exec -T valkey-cluster valkey-cli -p 7000 cluster info 2>/dev/null | grep cluster_state || true)
+            echo "$state"
+            if echo "$state" | grep -q "cluster_state:ok"; then exit 0; fi
+            sleep 2
+          done
+          echo "cluster did not become ready" && exit 1
 
       - name: Run tests
         run: npm test

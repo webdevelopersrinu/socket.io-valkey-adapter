@@ -1,7 +1,8 @@
 name: CI
 
 # Runs on every push and pull request, so contributors' changes are
-# automatically built and tested against a real Valkey server.
+# automatically built and tested against a real Valkey server and a
+# 6-node Valkey Cluster.
 on:
   push:
     branches: [main, master]
@@ -11,18 +12,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      valkey:
-        image: valkey/valkey:8
-        ports:
-          - 6379:6379
-
     strategy:
       matrix:
         node-version: [18, 20, 22]
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Start Valkey (standalone + cluster)
+        run: docker compose up -d
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -35,6 +33,16 @@ jobs:
 
       - name: Compile
         run: npm run compile
+
+      - name: Wait for cluster to be ready
+        run: |
+          for i in $(seq 1 30); do
+            state=$(docker compose exec -T valkey-cluster valkey-cli -p 7000 cluster info 2>/dev/null | grep cluster_state || true)
+            echo "$state"
+            if echo "$state" | grep -q "cluster_state:ok"; then exit 0; fi
+            sleep 2
+          done
+          echo "cluster did not become ready" && exit 1
 
       - name: Run tests
         run: npm test

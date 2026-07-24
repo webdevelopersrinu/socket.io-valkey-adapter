@@ -81,9 +81,11 @@ A message emitted on the instance on port 3000 reaches clients connected to the 
 ## Tests
 
 ```bash
-docker compose up -d   # start Valkey on localhost:6379
+docker compose up -d   # starts Valkey on localhost:6379 + a 6-node Valkey Cluster on localhost:7000-7005
 npm test
 ```
+
+The suite runs against both standalone Valkey and a real 6-node Valkey Cluster (regular adapter). The sharded adapter on a cluster is currently skipped: it requires per-node subscriber connections, which `iovalkey` does not support yet (ioredis added `shardedSubscribers` in v5.6.0, after the fork).
 
 ## License
 
