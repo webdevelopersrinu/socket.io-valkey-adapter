@@ -1,10 +1,15 @@
-# Socket.IO Valkey adapter
+# socket.io-valkey-adapter
 
-The `socket.io-valkey-adapter` package allows broadcasting packets between multiple Socket.IO servers using [Valkey](https://valkey.io) Pub/Sub.
+[![CI](https://github.com/webdevelopersrinu/socket.io-valkey-adapter/workflows/CI/badge.svg)](https://github.com/webdevelopersrinu/socket.io-valkey-adapter/actions)
+[![NPM version](https://badge.fury.io/js/socket.io-valkey-adapter.svg)](https://www.npmjs.com/package/socket.io-valkey-adapter)
 
-It is a native Valkey port of the official [`@socket.io/redis-adapter`](https://github.com/socketio/socket.io-redis-adapter) — same proven architecture, but backed by Valkey (open source forever, BSD) instead of Redis. It works with any ioredis-compatible Valkey client, such as [`iovalkey`](https://github.com/valkey-io/iovalkey).
+The `socket.io-valkey-adapter` package broadcasts packets between multiple Socket.IO servers using [Valkey](https://valkey.io) Pub/Sub — so a client connected to one server receives events emitted from any other server.
 
-**Team:** Stalwart Team · Valkey Hackathon 2026 (Track A — Integration #27)
+Built on Valkey (open source forever, BSD) and works with any ioredis-compatible Valkey client, such as [`iovalkey`](https://github.com/valkey-io/iovalkey).
+
+![Adapter diagram](./assets/adapter.png)
+
+> Pushing events from a process that is **not** a Socket.IO server? See the companion package [`socket.io-valkey-emitter`](https://www.npmjs.com/package/socket.io-valkey-emitter).
 
 ## How it works
 
@@ -45,7 +50,7 @@ io.listen(3000);
 A sharded adapter (using Valkey sharded Pub/Sub) is also available:
 
 ```js
-const { createShardedAdapter } = require("@socket.io/valkey-adapter");
+const { createShardedAdapter } = require("socket.io-valkey-adapter");
 
 const io = new Server({
   adapter: createShardedAdapter(pubClient, subClient),
@@ -54,11 +59,11 @@ const io = new Server({
 
 ## Options
 
-| Name                               | Description                                                                  | Default     |
-| ---------------------------------- | ---------------------------------------------------------------------------- | ----------- |
-| `key`                              | The prefix for the Valkey Pub/Sub channels.                                  | `socket.io` |
-| `requestsTimeout`                  | After this timeout the adapter stops waiting for responses to a request.     | `5000`      |
-| `publishOnSpecificResponseChannel` | Whether to publish responses to the channel specific to the requesting node. | `false`     |
+| Name                               | Description                                                                  | Default       |
+| ---------------------------------- | ---------------------------------------------------------------------------- | ------------- |
+| `key`                              | The prefix for the Valkey Pub/Sub channels.                                  | `socket.io`   |
+| `requestsTimeout`                  | After this timeout the adapter stops waiting for responses to a request.     | `5000`        |
+| `publishOnSpecificResponseChannel` | Whether to publish responses to the channel specific to the requesting node. | `false`       |
 | `parser`                           | The parser used to encode/decode messages sent to Valkey.                    | `notepack.io` |
 
 ## Run the example
@@ -76,17 +81,21 @@ PORT=3000 node example/index.js
 PORT=3001 node example/index.js
 ```
 
-A message emitted on the instance on port 3000 reaches clients connected to the instance on port 3001, proving cross-server broadcasting through Valkey.
+A message emitted on the instance on port 3000 reaches clients connected to the instance on port 3001 — proving cross-server broadcasting through Valkey.
 
 ## Tests
 
 ```bash
-docker compose up -d   # starts Valkey on localhost:6379 + a 6-node Valkey Cluster on localhost:7000-7005
+docker compose up -d   # Valkey on :6379 + a 6-node Valkey Cluster on :7000-7005
 npm test
 ```
 
-The suite runs against both standalone Valkey and a real 6-node Valkey Cluster (regular adapter). The sharded adapter on a cluster is currently skipped: it requires per-node subscriber connections, which `iovalkey` does not support yet (ioredis added `shardedSubscribers` in v5.6.0, after the fork).
+The suite runs against both standalone Valkey and a real 6-node Valkey Cluster. The sharded adapter on a cluster is currently skipped: it needs per-node subscriber connections, which `iovalkey` does not support yet.
 
 ## License
 
 [MIT](LICENSE)
+
+---
+
+Released at **Valkey Hackathon 2026**, held at the Amazon office in Hyderabad and conducted by **React Hyderabad**.
