@@ -1,6 +1,6 @@
 {
   "name": "socket.io-valkey-adapter",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The Socket.IO Valkey adapter, allowing to broadcast events between several Socket.IO servers",
   "license": "MIT",
   "homepage": "https://valkey.srinudesetti.in/",
